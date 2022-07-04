@@ -1,0 +1,40 @@
+name: PR Validation
+
+on:
+  # needs read/write GH token, do *not* execute arbitrary code from PR
+  pull_request_target:
+    types: [edited]
+
+jobs:
+  check-pr:
+    name: "check: Validate PR messages"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Run validation script"
+        uses: actions/github-script@v6.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pr } = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            console.log('Title:', pr.title);
+
+            if (!/^(feat|fix|doc|style|refactor|test|chore|perf): .*[^.]$/.test(pr.title)) {
+              await github.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                event: 'REQUEST_CHANGES',
+                body: 'Invalid commit message format.'
+              });
+            } else {
+              await github.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                event: 'APPROVE',
+              });
+            }
