@@ -21,10 +21,21 @@
 
         jobs = rec {
           packages = flake-utils.lib.flattenTree rec {
+            hi = pkgs.stdenv.mkDerivation {
+              name = "hi";
+              requiredSystemFeatures = [ "recursive-nix" ];
+              buildCommand = ''
+                mkdir -p $out/bin
+                gcc -o hi.o -c ${./src/hi.c} -DWHO='"world"'
+                gcc -o $out/bin/hi hi.o
+                $out/bin/hi
+              '';
+            };
+
             testing = pkgs.runCommand "testing" { } ''
               set -x
               mkdir -p $out/bin $out/share
-              ln -s ${pkgs.hello}/bin/hello $out/bin/testing
+              ln -s ${packages.hi}/bin/hi $out/bin/testing
               cp ${./dump/hello.txt} $out/share
               cp ${./dump/test.txt} $out/share
               cp ${./dump/wow.txt} $out/share
