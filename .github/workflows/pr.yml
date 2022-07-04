@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-pr:
-    name: "check: Validate PR messages"
+    name: "check: Validate PR title"
     runs-on: ubuntu-latest
     steps:
       - name: "Run validation script"
@@ -51,7 +51,7 @@ jobs:
               await core.setFailed(msg);
             } else {
               var msg = 'Success; PR title is valid; skipping review (it already exists)';
-              if (actions_state !== 'APPROVE') {
+              if (actions_state !== 'APPROVED') {
                 await github.rest.pulls.createReview({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
