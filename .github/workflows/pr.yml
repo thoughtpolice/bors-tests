@@ -47,7 +47,7 @@ jobs:
                   repo: context.repo.repo,
                   pull_number: context.issue.number,
                   event: 'REQUEST_CHANGES',
-                  body: 'Invalid commit message format.'
+                  body: 'PR title is incorrectly formatted. Please fix it before this can be merged.'
                 });
                 msg = 'Failing CI check due to bad PR title, and left a REQUEST_CHANGES review';
               }
@@ -60,6 +60,7 @@ jobs:
                   repo: context.repo.repo,
                   pull_number: context.issue.number,
                   event: 'APPROVE',
+                  body: 'PR title is correctly formatted. Thanks!'
                 });
                 msg = 'Success; PR title is valid; and leaving APPROVE review';
               }
