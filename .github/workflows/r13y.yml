@@ -24,27 +24,40 @@ jobs:
           #!/usr/bin/env bash
           exec >&2
           echo "For derivation \$3 (tmpdir = \$4):"
-          exec /nix/var/nix/profiles/default/bin/diffoscope --text /tmp/report.txt "\$1" "\$2"
+          exec /nix/var/nix/profiles/default/bin/diffoscope --html /tmp/report.html --text /tmp/report.txt "\$1" "\$2"
           EOF
           chmod +x diff-hook.sh && sudo mv diff-hook.sh /etc/nix/diff-hook.sh
       - name: Build world, normally
         run: nix build .#world
-      - name: Iterate and rebuild, one at a time
+      - name: Iterate, rebuild, and archive r13y results
         run: |
+          sudo mkdir /tmp/diffoscope-reports
           while read -r line; do
             attr=$(cat "result/$line")
             echo "R13Y test of $attr (repeats=3)"
+
+            # build, but don't exit on error. set -e is implied
             # https://github.community/t/github-action-terminates-on-first-non-zero-exit-code/240701
             if ! nix --option run-diff-hook true \
                      --option diff-hook /etc/nix/diff-hook.sh \
                      --option enforce-determinism true \
                      --option repeat 3 \
                    build ".#$attr" --no-link --rebuild --keep-failed; then
-              echo "Failed report. Diff from 'diffoscope' below:"
+              echo "Failed. Diff from 'diffoscope' below:"
               cat /tmp/report.txt
-              sudo mv /tmp/report.txt /tmp/report-$attr.txt
+              sudo mv /tmp/report.txt  /tmp/diffoscope-reports/$attr.txt
+              sudo mv /tmp/report.html /tmp/diffoscope-reports/$attr.html
             else
-              sudo rm -f /tmp/report.txt
+              sudo rm -f /tmp/report.*
             fi
           done < result/nix-refs
           echo "\nDone."
+
+          # now exit after we're done
+          [[ compgen -G "/tmp/diffoscope-reports/*" ]] && exit 1
+      - name: Upload diffoscope failure reports
+        if: failure() # always runs if previous step fails
+        uses: actions/upload-artifact@v3
+        with:
+          name: r13y-reports
+          path: /tmp/diffoscope-reports
