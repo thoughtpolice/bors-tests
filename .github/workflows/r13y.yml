@@ -31,17 +31,31 @@ jobs:
         run: nix build .#world
       - name: Iterate and rebuild world, repeatedly
         run: |
+          echo "Performing R13Y tests"
+          echo "====================="
+          repeats=3
+
+          if [[ ${{ github.event_name }} == "schedule" ]]; then
+            repeats=10
+            echo "Nightly build; using a high repeat count: $repeats"
+          elif [[ ${{ github.event_name }} == "push" ]]; then
+            echo "Push event; using a moderate repeat count: $repeats"
+            repeats=5
+          else
+            echo "WARNING: invalid event name, using low repeat count: $repeats"
+          fi
+
           sudo mkdir /tmp/diffoscope-reports
           while read -r line; do
             attr=$(cat "result/$line")
-            echo "R13Y test of $attr (repeats=3)"
+            echo "R13Y test of $attr (repeats=$repeats)"
 
             # build, but don't exit on error. set -e is implied
             # https://github.community/t/github-action-terminates-on-first-non-zero-exit-code/240701
             if ! nix --option run-diff-hook true \
                      --option diff-hook /etc/nix/diff-hook.sh \
                      --option enforce-determinism true \
-                     --option repeat 3 \
+                     --option repeat $repeats \
                    build ".#$attr" --no-link --rebuild --keep-failed; then
               echo "Failed. Diff from 'diffoscope' below:"
               cat /tmp/report.txt
