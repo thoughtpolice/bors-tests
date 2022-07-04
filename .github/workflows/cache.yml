@@ -34,4 +34,4 @@ jobs:
           sudo mv cache-upload.sh /etc/nix/cache-upload.sh
 
       - name: Build and populate cache
-        run: nix build .#world -L
+        run: nix build .#world
