@@ -21,13 +21,19 @@
 
       in rec {
         packages = flake-utils.lib.flattenTree rec {
-          default = hello;
+          default = testing;
 
-          hello = pkgs.hello;
+          testing = pkgs.runCommand "testing" { nativeBuildInputs = [ ]; } ''
+            mkdir -p $out/bin $out/share
+            ln -s ${pkgs.hello}/bin/hello $out/bin/testing
+            cp ${./dump/hello.txt} $out/share
+            cp ${./dump/test.txt} $out/share
+            cp ${./dump/wow.txt} $out/share
+          '';
 
           apps = flake-utils.lib.flattenTree rec {
-            default = run-vm;
-            run-vm = { type = "app"; program = "${packages.hello}/bin/hello"; };
+            default = testing;
+            testing = { type = "app"; program = "${testing}/bin/testing"; };
           };
         };
       }
