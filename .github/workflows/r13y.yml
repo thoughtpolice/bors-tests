@@ -51,10 +51,10 @@ jobs:
               sudo rm -f /tmp/report.*
             fi
           done < result/nix-refs
-          echo "\nDone."
+          echo "Done."
 
-          # now exit after we're done
-          [[ compgen -G "/tmp/diffoscope-reports/*" ]] && exit 1
+          # now exit _after_ we're done doing reports
+          (compgen -G "/tmp/diffoscope-reports/*" >/dev/null) && exit 1
       - name: Upload diffoscope failure reports
         if: failure() # always runs if previous step fails
         uses: actions/upload-artifact@v3
