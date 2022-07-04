@@ -33,4 +33,4 @@ jobs:
           cat /etc/nix/cache-upload.sh
 
       - name: Build and populate cache
-        run: nix build .#world
+        run: nix build .#world -L
