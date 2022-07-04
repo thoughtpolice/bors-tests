@@ -30,6 +30,7 @@ jobs:
                 event: 'REQUEST_CHANGES',
                 body: 'Invalid commit message format.'
               });
+              await core.setFailed('Failing CI check due to bad message');
             } else {
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
