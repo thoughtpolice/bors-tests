@@ -9,6 +9,7 @@ jobs:
   check-pr:
     name: "check: Validate PR title"
     runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
     steps:
       - name: "Run validation script"
         uses: actions/github-script@v6.1.0
