@@ -22,6 +22,16 @@ jobs:
             });
             console.log('Title:', pr.title);
 
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            for (const r of reviews) {
+              console.log("Review author: ", review.user.id, review.user.author_association, review.user.login);
+            }
+
             if (!/^(feat|fix|doc|style|refactor|test|chore|perf): .*[^.]$/.test(pr.title)) {
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
