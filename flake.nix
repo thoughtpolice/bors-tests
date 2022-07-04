@@ -45,11 +45,15 @@
         inherit (jobs) apps;
         packages = flake-utils.lib.flattenTree rec {
           default = world;
-          world = let
-            refs = [ jobs.packages.testing jobs.packages.repro-test ];
-            cmds = pkgs.lib.concatStringsSep "\n" (map (x: "echo ${x} >> $out") refs);
-          in pkgs.runCommand "world.txt" { } ''
-            set -feu; touch $out
+          world = with pkgs.lib; let
+            refs = mapAttrsToList nameValuePair jobs.packages;
+            cmds = concatStringsSep "\n" (map (x: ''
+              x=$(basename ${x.value})
+              echo $x >> $out/nix-refs
+              echo ${x.name} >> $out/$x
+            '') refs);
+          in pkgs.runCommand "world" { } ''
+            set -feu; mkdir $out
             ${cmds}
           '';
         } // jobs.packages;
