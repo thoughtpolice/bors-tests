@@ -1,5 +1,6 @@
 status = [ "build:%" ]
 block-labels = [ "S-wip", "S-nomerge" ]
+pr-status = [ "check:%" ]
 
 delete-merged-branches = true
 timeout-sec = 7200 # two hours
