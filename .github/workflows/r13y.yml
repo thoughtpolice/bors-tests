@@ -39,8 +39,8 @@ jobs:
             repeats=10
             echo "Nightly build; using a high repeat count: $repeats"
           elif [[ ${{ github.event_name }} == "push" ]]; then
-            echo "Push event; using a moderate repeat count: $repeats"
             repeats=5
+            echo "Push event; using a moderate repeat count: $repeats"
           else
             echo "WARNING: invalid event name, using low repeat count: $repeats"
           fi
