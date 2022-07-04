@@ -19,7 +19,8 @@ jobs:
         run: |
           cat <<EOF > cache-upload.sh
           #!/usr/bin/env bash
-          set -e; set -f; export IFS=' '
+          set -ef
+          export IFS=' '
           [[ -z $OUT_PATHS ]] && exit
           export S3_BUCKET="${{ secrets.S3_BUCKET }}"
           export S3_ENDPOINT="${{ secrets.S3_ENDPOINT }}"
