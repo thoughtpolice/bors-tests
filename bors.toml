@@ -4,7 +4,7 @@ block-labels = [ "S-wip", "S-nomerge" ]
 delete-merged-branches = true
 timeout-sec = 7200 # two hours
 
-cut-body-after = "<!-- Boilerplate:start -->" # see PULL_REQUEST_TEMPLATE.md
+cut-body-after = "\n<!-- Boilerplate:start -->" # see PULL_REQUEST_TEMPLATE.md
 
 ## [NOTE] (aseipp): these can't be enabled because you can't self-review or
 ## self-approve things you're a codeowner of, and bors does not like that...
