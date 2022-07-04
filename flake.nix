@@ -32,7 +32,7 @@
 
             repro-test = pkgs.runCommand "unstable" { } ''
               touch $out
-              echo $RANDOM > $out
+             #echo $RANDOM > $out
             '';
           };
 
