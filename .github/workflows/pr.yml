@@ -3,7 +3,7 @@ name: PR Validation
 on:
   # needs read/write GH token, do *not* execute arbitrary code from PR
   pull_request_target:
-    types: [opened, edited]
+    types: [opened, synchronize, edited]
 
 jobs:
   check-pr:
