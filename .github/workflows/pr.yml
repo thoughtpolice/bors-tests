@@ -29,7 +29,7 @@ jobs:
             });
 
             for (const r of reviews) {
-              console.log("Review author: ", review.user.id, review.user.author_association, review.user.login);
+              console.log("Review author: ", r.user.id, r.user.author_association, r.user.login);
             }
 
             if (!/^(feat|fix|doc|style|refactor|test|chore|perf): .*[^.]$/.test(pr.title)) {
