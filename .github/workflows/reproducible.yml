@@ -1,11 +1,10 @@
-name: Nightly R13Y
+name: R13Y
 
 on:
-  # on push to 'main' while WIP
   push:
     branches: [ main ]
-  #schedule:
-  #  - cron: '0 2 * * *' # run at 2 AM UTC
+  schedule:
+  - cron: '0 2 * * *' # run at 2 AM UTC
 
 jobs:
   build:
@@ -43,9 +42,9 @@ jobs:
                    build ".#$attr" --no-link --rebuild --keep-failed; then
               echo "Failed report. Diff from 'diffoscope' below:"
               cat /tmp/report.txt
-              mv /tmp/report.txt /tmp/report-$attr.txt
+              sudo mv /tmp/report.txt /tmp/report-$attr.txt
             else
-              rm -f /tmp/report.txt
+              sudo rm -f /tmp/report.txt
             fi
           done < result/nix-refs
           echo "\nDone."
