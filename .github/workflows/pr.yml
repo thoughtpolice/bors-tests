@@ -28,24 +28,37 @@ jobs:
               pull_number: context.issue.number,
             });
 
+            var actions_state = null;
             for (const r of reviews) {
-              console.log("Review author: ", r.user.id, r.user.author_association, r.user.login);
+              console.log(`Existing review by id=${r.user.id} (${r.user.login})`);
+              if (r.user.id == 41898282 /* github-actions[bot] */) {
+                actions_state = r.state;
+              }
             }
 
             if (!/^(feat|fix|doc|style|refactor|test|chore|perf): .*[^.]$/.test(pr.title)) {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.issue.number,
-                event: 'REQUEST_CHANGES',
-                body: 'Invalid commit message format.'
-              });
-              await core.setFailed('Failing CI check due to bad message');
+              var msg = 'Failing CI check due to bad PR title; skipping review (it already exists)';
+              if (actions_state !== 'CHANGES_REQUESTED') {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  event: 'REQUEST_CHANGES',
+                  body: 'Invalid commit message format.'
+                });
+                msg = 'Failing CI check due to bad PR title, and left a REQUEST_CHANGES review';
+              }
+              await core.setFailed(msg);
             } else {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.issue.number,
-                event: 'APPROVE',
-              });
+              var msg = 'Success; PR title is valid; skipping review (it already exists)';
+              if (actions_state !== 'APPROVE') {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  event: 'APPROVE',
+                });
+                msg = 'Success; PR title is valid; and leaving APPROVE review';
+              }
+              console.log(msg);
             }
