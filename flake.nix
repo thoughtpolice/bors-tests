@@ -19,23 +19,34 @@
           inherit system;
         };
 
-      in rec {
-        packages = flake-utils.lib.flattenTree rec {
-          default = testing;
+        jobs = rec {
+          packages = flake-utils.lib.flattenTree rec {
+            testing = pkgs.runCommand "testing" { } ''
+              set -x
+              mkdir -p $out/bin $out/share
+              ln -s ${pkgs.hello}/bin/hello $out/bin/testing
+              cp ${./dump/hello.txt} $out/share
+              cp ${./dump/test.txt} $out/share
+              cp ${./dump/wow.txt} $out/share
+            '';
+          };
 
-          testing = pkgs.runCommand "testing" { nativeBuildInputs = [ ]; } ''
-            mkdir -p $out/bin $out/share
-            ln -s ${pkgs.hello}/bin/hello $out/bin/testing
-            cp ${./dump/hello.txt} $out/share
-            cp ${./dump/test.txt} $out/share
-            cp ${./dump/wow.txt} $out/share
-          '';
-
-          apps = flake-utils.lib.flattenTree rec {
+          apps = rec {
             default = testing;
-            testing = { type = "app"; program = "${testing}/bin/testing"; };
+            testing = { type = "app"; program = "${packages.testing}/bin/testing"; };
           };
         };
-      }
-    );
+      in {
+        inherit (jobs) apps;
+        packages = flake-utils.lib.flattenTree rec {
+          default = world;
+          world = let
+            refs = [ jobs.packages.testing ];
+            cmds = pkgs.lib.concatStringsSep "\n" (map (x: "echo ${x} >> $out") refs);
+          in pkgs.runCommand "world.txt" { } ''
+            set -feu; touch $out
+            ${cmds}
+          '';
+        } // jobs.packages;
+      });
 }
