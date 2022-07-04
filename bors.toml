@@ -1,5 +1,4 @@
 status = [ "build:%", "test:%" ]
-pr-status = [ "check:%" ]
 block-labels = [ "S-wip", "S-nomerge" ]
 
 delete-merged-branches = true
