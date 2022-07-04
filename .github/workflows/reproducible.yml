@@ -1,0 +1,33 @@
+name: Nightly R13Y
+
+on:
+  # on push to 'main' while WIP
+  push:
+    branches: [ main ]
+  #schedule:
+  #  - cron: '0 2 * * *' # run at 2 AM UTC
+
+jobs:
+  build:
+    name: "nightly: Reproducibility check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v17
+        with:
+          install_url: https://releases.nixos.org/nix/nix-2.9.2/install
+      - name: Install tools
+        run: |
+          sudo -i nix-env -i \
+            $(nix build nixpkgs#diffoscopeMinimal nixpkgs#jq --no-link --print-out-paths)
+      - name: Setup diff hook
+        run: |
+          cat <<EOF > diff-hook.sh
+          #!/usr/bin/env bash
+          exec >&2
+          echo "For derivation \$3 (tmpdir = \$4):"
+          exec /nix/var/nix/profiles/default/bin/diffoscope --text - "\$1" "\$2"
+          EOF
+          chmod +x diff-hook.sh && sudo mv diff-hook.sh /etc/nix/diff-hook.sh
+      - name: Build world, normally
+        run: nix build .#world

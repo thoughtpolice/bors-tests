@@ -29,6 +29,11 @@
               cp ${./dump/test.txt} $out/share
               cp ${./dump/wow.txt} $out/share
             '';
+
+            repro-test = pkgs.runCommand "unstable" { } ''
+              touch $out
+              echo $RANDOM > $out
+            '';
           };
 
           apps = rec {
@@ -41,7 +46,7 @@
         packages = flake-utils.lib.flattenTree rec {
           default = world;
           world = let
-            refs = [ jobs.packages.testing ];
+            refs = [ jobs.packages.testing jobs.packages.repro-test ];
             cmds = pkgs.lib.concatStringsSep "\n" (map (x: "echo ${x} >> $out") refs);
           in pkgs.runCommand "world.txt" { } ''
             set -feu; touch $out
