@@ -30,8 +30,7 @@ jobs:
             --to "s3://\$S3_BUCKET?scheme=https&endpoint=\$S3_ENDPOINT" \
             \$DRV_PATH \$OUT_PATHS
           EOF
-          chmod +x cache-upload.sh
-          sudo mv cache-upload.sh /etc/nix/cache-upload.sh
+          chmod +x cache-upload.sh && sudo mv cache-upload.sh /etc/nix/cache-upload.sh
 
       - name: Build and populate cache
         run: nix build .#world
