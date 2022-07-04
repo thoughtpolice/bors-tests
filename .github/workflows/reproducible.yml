@@ -35,13 +35,12 @@ jobs:
           while read -r line; do
             attr=$(cat "result/$line")
             echo "R13Y test of $attr (repeats=3)"
-            nix \
-                --option run-diff-hook true \
-                --option diff-hook /etc/nix/diff-hook.sh \
-                --option enforce-determinism true \
-                --option repeat 3 \
-              build ".#$attr" --no-link --rebuild --keep-failed
-            if [[ "$?" = "1" ]]; then
+            # https://github.community/t/github-action-terminates-on-first-non-zero-exit-code/240701
+            if ! nix --option run-diff-hook true \
+                     --option diff-hook /etc/nix/diff-hook.sh \
+                     --option enforce-determinism true \
+                     --option repeat 3 \
+                   build ".#$attr" --no-link --rebuild --keep-failed; then
               echo "Failed report. Diff from 'diffoscope' below:"
               cat /tmp/report.txt
               mv /tmp/report.txt /tmp/report-$attr.txt
