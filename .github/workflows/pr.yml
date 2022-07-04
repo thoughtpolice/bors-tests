@@ -21,10 +21,16 @@ jobs:
               pull_number: context.issue.number,
             });
 
-            console.log(`Event info: '${context.actor}'`);
-            console.log(context.payload)
-            console.log('Title:', pr.title);
+            // after bors merges something, it updates the pr title, so we
+            // have to skip that case
+            if (  context.actor === 'bors[bot]'
+               && context.payload.action === 'edited'
+               && pr.title.startsWith('[Merged by Bors] -')) {
+              console.log(`Action triggered by bors merging a pull request; skipping...`);
+              return;
+            }
 
+            console.log(`Title: ${pr.title}`);
             const { data: reviews } = await github.rest.pulls.listReviews({
               owner: context.repo.owner,
               repo: context.repo.repo,
