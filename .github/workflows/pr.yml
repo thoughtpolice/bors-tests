@@ -9,7 +9,6 @@ jobs:
   check-pr:
     name: "check: Validate PR title"
     runs-on: ubuntu-latest
-    if: github.event.action != 'closed'
     steps:
       - name: "Run validation script"
         uses: actions/github-script@v6.1.0
@@ -21,6 +20,8 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number,
             });
+
+            console.log(`Event info: '${context.eventName}','${context.action}', '${context.actor}'`);
             console.log('Title:', pr.title);
 
             const { data: reviews } = await github.rest.pulls.listReviews({
