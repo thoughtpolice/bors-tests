@@ -21,7 +21,8 @@ jobs:
               pull_number: context.issue.number,
             });
 
-            console.log(`Event info: '${context.eventName}','${context.action}', '${context.actor}'`);
+            console.log(`Event info: '${context.actor}'`);
+            console.log(context.payload)
             console.log('Title:', pr.title);
 
             const { data: reviews } = await github.rest.pulls.listReviews({
