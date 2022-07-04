@@ -32,6 +32,9 @@ jobs:
             for (const r of reviews) {
               console.log(`Existing review by id=${r.user.id} (${r.user.login})`);
               if (r.user.id == 41898282 /* github-actions[bot] */) {
+                // reviews are immutable, and always in chronological order, so
+                // don't break from the loop on a hit; we need to get the latest
+                // review by the bot
                 actions_state = r.state;
               }
             }
