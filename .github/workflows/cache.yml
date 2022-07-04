@@ -21,10 +21,6 @@ jobs:
           #!/usr/bin/env bash
           set -eu; set -f; export IFS=' '
           [[ -z "\$OUT_PATHS" ]] && exit
-          export S3_BUCKET="${{ secrets.S3_BUCKET }}"
-          export S3_ENDPOINT="${{ secrets.S3_ENDPOINT }}"
-          export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
-          export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
           echo "Uploading paths" \$DRV_PATH " " \$OUT_PATHS
           exec /nix/var/nix/profiles/default/bin/nix copy \
             --to "s3://${S3_BUCKET}?scheme=https&endpoint=${S3_ENDPOINT}" \
@@ -34,6 +30,7 @@ jobs:
           sudo mv cache-upload.sh /etc/nix/cache-upload.sh
           echo "Created build hook"
           stat /etc/nix/cache-upload.sh
+          cat /etc/nix/cache-upload.sh
 
       - name: Build and populate cache
         run: nix build .#world
