@@ -19,14 +19,16 @@
           inherit system;
         };
 
+        nix-ccache = import ./src/nix-ccache.nix { inherit pkgs; };
+
         jobs = rec {
           packages = flake-utils.lib.flattenTree rec {
-            hi = pkgs.stdenv.mkDerivation {
+            hi = nix-ccache.stdenv.mkDerivation {
               name = "hi";
               requiredSystemFeatures = [ "recursive-nix" ];
               buildCommand = ''
                 mkdir -p $out/bin
-                gcc -o hi.o -c ${./src/hi.c} -DWHO='"world"'
+                gcc -Wall -o hi.o -c ${./src/hi.c} -DWHO='"world"'
                 gcc -o $out/bin/hi hi.o
                 $out/bin/hi
               '';
