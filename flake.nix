@@ -26,11 +26,19 @@
             hi = nix-ccache.stdenv.mkDerivation {
               name = "hi";
               requiredSystemFeatures = [ "recursive-nix" ];
-              buildCommand = ''
+              separateDebugInfo = true;
+
+              src = ./src/hi.c;
+              unpackPhase = ":";
+
+              buildPhase = ''
+                gcc -Wall -Og -g -ggdb -o hi.o -c $src -DWHO='"world"'
+                gcc -g -ggdb -o hi hi.o
+              '';
+
+              installPhase = ''
                 mkdir -p $out/bin
-                gcc -Wall -o hi.o -c ${./src/hi.c} -DWHO='"world"'
-                gcc -o $out/bin/hi hi.o
-                $out/bin/hi
+                mv hi $out/bin/hi
               '';
             };
 

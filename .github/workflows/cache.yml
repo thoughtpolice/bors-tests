@@ -28,7 +28,7 @@ jobs:
           export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
           echo "Uploading paths" \$DRV_PATH " " \$OUT_PATHS
           exec /nix/var/nix/profiles/default/bin/nix copy \
-            --to "s3://\$S3_BUCKET?scheme=https&endpoint=\$S3_ENDPOINT" \
+            --to "s3://\$S3_BUCKET?write-nar-listing=1&index-debug-info=1&compression=zstd&scheme=https&endpoint=\$S3_ENDPOINT" \
             \$DRV_PATH \$OUT_PATHS
           EOF
           chmod +x cache-upload.sh && sudo mv cache-upload.sh /etc/nix/cache-upload.sh
