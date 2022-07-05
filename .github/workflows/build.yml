@@ -18,7 +18,7 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes recursive-nix ca-derivations
       - name: Build
-        run: nix build
+        run: nix build .#world
       - name: Flake check
         run: nix flake check
       - name: Smoke run
